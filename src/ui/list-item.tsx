@@ -8,12 +8,18 @@ type ListItemProps = {
   handleUpdateMemoState: (memo: Memo) => void;
   handleDeleteMemo: (memoId: Memo["id"]) => void;
 };
-export default function ListItem({
+export const MechaOsoiListItem = function MechaOsoiListItem({
   memo,
   handleUpdateMemoTitle,
   handleUpdateMemoState,
   handleDeleteMemo,
 }: ListItemProps) {
+  console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE IN LIST ITEM!!!!!");
+  const startTime = performance.now();
+  while (performance.now() - startTime < 500) {
+    // 🦥 0.5秒間何もしない
+  }
+
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div
@@ -75,4 +81,4 @@ export default function ListItem({
       </div>
     </div>
   );
-}
+};

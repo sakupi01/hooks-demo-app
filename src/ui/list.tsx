@@ -1,4 +1,4 @@
-import ListItem from "./list-item";
+import { MechaOsoiListItem } from "./list-item";
 import { Memo } from "../../types";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "./button";
@@ -6,7 +6,7 @@ import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
 import { useMemosContext } from "../hooks/useMemosContext";
 
-export function MemoListPresenter() {
+export const MemoListPresenter = function MemoListPresenter() {
   const ref = useRef<HTMLInputElement>(null);
   const { memos, asyncDispatch } = useMemosContext();
   const [filter, setFilter] = useState<"marked" | "unmarked" | "all">("all");
@@ -141,7 +141,7 @@ export function MemoListPresenter() {
             {/* ✅ レンダリングを効率的に活かせる！ */}
             {filteredMemos.map((memo) => {
               return (
-                <ListItem
+                <MechaOsoiListItem
                   key={memo.id}
                   memo={memo}
                   handleUpdateMemoTitle={handleUpdateMemoTitle}
@@ -161,4 +161,4 @@ export function MemoListPresenter() {
       </div>
     </main>
   );
-}
+};
