@@ -2,6 +2,7 @@ import { ChangeEvent } from "react";
 import { useThemeContext } from "./hooks/useThemeContext";
 import clsx from "clsx";
 import { OnlineStateIndicator } from "./ui/online-state-indicator";
+import Timer from "./ui/timer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { theme, toggleTheme } = useThemeContext();
@@ -25,7 +26,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </select>
         <OnlineStateIndicator />
       </div>
-      <div className="flex-grow overflow-y-auto py-20">{children}</div>
+      <Timer />
+      <div className="flex-grow overflow-y-auto py-5">{children}</div>
     </div>
   );
 }
