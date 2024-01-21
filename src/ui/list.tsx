@@ -1,6 +1,6 @@
 import { MechaOsoiListItem } from "./list-item";
 import { Memo } from "../../types";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "./button";
 import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
@@ -12,69 +12,85 @@ export const MemoListPresenter = function MemoListPresenter() {
   const [filter, setFilter] = useState<"marked" | "unmarked" | "all">("all");
   const { theme } = useThemeContext();
 
-  async function handleAddMemo(title: Memo["title"]) {
-    asyncDispatch(
-      // Thunk actionを渡す
-      async (dispatch) => {
-        const addedMemo = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/create/memo`,
+  // ✅キャッシュしたいMechaOsoiListItemが受け取るpropsである
+  // handle...系関数をuseCallbackによりキャッシュする
+  // useCallbackを使用しない場合は，関数はレンダリングのたびに再生成される
+  // asyncDispatch以外の変更があった時以外は，同じ参照の関数が使用される（キャッシュされる）
+  const handleAddMemo = useCallback(
+    (title: Memo["title"]) => {
+      asyncDispatch(
+        // Thunk actionを渡す
+        async (dispatch) => {
+          const addedMemo = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/create/memo`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ title: title }),
+            }
+          ).then((res) => res.json());
+          dispatch({ type: "add", payload: addedMemo });
+        }
+      );
+    },
+    [asyncDispatch]
+  );
+
+  const handleUpdateMemoTitle = useCallback(
+    (memo: Memo) => {
+      asyncDispatch(async (dispatch) => {
+        const updatedMemo = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/update/memo/title`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ title: title }),
+            body: JSON.stringify({ id: memo.id, title: memo.title }),
           }
         ).then((res) => res.json());
-        dispatch({ type: "add", payload: addedMemo });
-      }
-    );
-  }
-
-  async function handleUpdateMemoTitle(memo: Memo) {
-    asyncDispatch(async (dispatch) => {
-      const updatedMemo = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/update/memo/title`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: memo.id, title: memo.title }),
-        }
-      ).then((res) => res.json());
-      dispatch({ type: "update", payload: updatedMemo });
-    });
-  }
-
-  async function handleUpdateMemoState(memo: Memo) {
-    asyncDispatch(async (dispatch) => {
-      const updatedMemo = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/update/memo/state`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: memo.id, marked: memo.marked }),
-        }
-      ).then((res) => res.json());
-      dispatch({ type: "update", payload: updatedMemo });
-    });
-  }
-
-  function handleDeleteMemo(memoId: Memo["id"]) {
-    asyncDispatch(async (dispatch) => {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/memo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: memoId }),
+        dispatch({ type: "update", payload: updatedMemo });
       });
-      dispatch({ type: "delete", payload: { id: memoId } });
-    });
-  }
+    },
+    [asyncDispatch]
+  );
+
+  const handleUpdateMemoState = useCallback(
+    (memo: Memo) => {
+      asyncDispatch(async (dispatch) => {
+        const updatedMemo = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/update/memo/state`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: memo.id, marked: memo.marked }),
+          }
+        ).then((res) => res.json());
+        dispatch({ type: "update", payload: updatedMemo });
+      });
+    },
+    [asyncDispatch]
+  );
+
+  const handleDeleteMemo = useCallback(
+    (memoId: Memo["id"]) => {
+      asyncDispatch(async (dispatch) => {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/memo`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: memoId }),
+        });
+        dispatch({ type: "delete", payload: { id: memoId } });
+      });
+    },
+    [asyncDispatch]
+  );
 
   // ✅ useMemoを使って、filter, memos以外のstateが変更された時の再計算をスキップする
   const filteredMemos = useMemo(() => {

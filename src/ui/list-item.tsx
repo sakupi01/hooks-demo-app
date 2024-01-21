@@ -1,14 +1,14 @@
 import clsx from "clsx";
 import { Memo } from "../../types/index";
 import { Button } from "./button";
-import { useRef } from "react";
+import { useRef, memo } from "react";
 type ListItemProps = {
   memo: Memo;
   handleUpdateMemoTitle: (memo: Memo) => void;
   handleUpdateMemoState: (memo: Memo) => void;
   handleDeleteMemo: (memoId: Memo["id"]) => void;
 };
-export const MechaOsoiListItem = function MechaOsoiListItem({
+export const MechaOsoiListItem = memo(function MechaOsoiListItem({
   memo,
   handleUpdateMemoTitle,
   handleUpdateMemoState,
@@ -81,4 +81,4 @@ export const MechaOsoiListItem = function MechaOsoiListItem({
       </div>
     </div>
   );
-};
+});
