@@ -1,16 +1,14 @@
 import ListItem from "./list-item";
 import { Memo } from "../../types";
-import { Dispatch, useRef } from "react";
+import { useRef } from "react";
 import { Button } from "./button";
+import { useReducer } from "react";
+import { memosReducer } from "../reducer";
 
-export function MemoListPresenter({
-  memos,
-  setMemos,
-}: {
-  memos: Memo[];
-  setMemos: Dispatch<React.SetStateAction<Memo[]>>;
-}) {
+export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
   const ref = useRef<HTMLInputElement>(null);
+  const [memos, dispatch] = useReducer(memosReducer, initialMemos);
+
   async function handleAddMemo(title: Memo["title"]) {
     const addedMemo = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/create/memo`,
@@ -22,7 +20,7 @@ export function MemoListPresenter({
         body: JSON.stringify({ title: title }),
       }
     ).then((res) => res.json());
-    setMemos([...memos, addedMemo]);
+    dispatch({ type: "add", payload: addedMemo });
   }
 
   async function handleUpdateMemoTitle(memo: Memo) {
@@ -37,14 +35,7 @@ export function MemoListPresenter({
       }
     ).then((res) => res.json());
 
-    setMemos(
-      memos.map((m) => {
-        if (m.id === memo.id) {
-          return updatedMemo;
-        }
-        return m;
-      })
-    );
+    dispatch({ type: "update", payload: updatedMemo });
   }
 
   async function handleUpdateMemoState(memo: Memo) {
@@ -59,14 +50,7 @@ export function MemoListPresenter({
       }
     ).then((res) => res.json());
 
-    setMemos(
-      memos.map((m) => {
-        if (m.id === memo.id) {
-          return updatedMemo;
-        }
-        return m;
-      })
-    );
+    dispatch({ type: "update", payload: updatedMemo });
   }
 
   function handleDeleteMemo(memoId: Memo["id"]) {
@@ -77,7 +61,7 @@ export function MemoListPresenter({
       },
       body: JSON.stringify({ id: memoId }),
     });
-    setMemos(memos.filter((m) => m.id !== memoId));
+    dispatch({ type: "delete", payload: { id: memoId } });
   }
 
   return (

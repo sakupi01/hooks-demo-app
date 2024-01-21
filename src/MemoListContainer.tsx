@@ -6,7 +6,7 @@ import { Memo } from "../types";
 let didInit = false;
 
 function MemoListContainer() {
-  const [memos, setMemos] = useState<Memo[]>([]);
+  const [memos, setMemos] = useState<Memo[] | undefined>(undefined);
   useEffect(() => {
     if (didInit) return;
     const fetchData = async () => {
@@ -23,7 +23,10 @@ function MemoListContainer() {
       .catch(console.error);
     didInit = true;
   }, []);
-  return <MemoListPresenter memos={memos} setMemos={setMemos} />;
+  if (memos === undefined) {
+    return;
+  }
+  return <MemoListPresenter memos={memos} />;
 }
 
 export default MemoListContainer;
