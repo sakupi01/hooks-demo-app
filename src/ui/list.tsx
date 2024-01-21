@@ -1,8 +1,7 @@
 import ListItem from "./list-item";
 import { Memo } from "../../types";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./button";
-// import { useReducer } from "react";
 import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
 import { useMemosContext } from "../hooks/useMemosContext";
@@ -10,7 +9,16 @@ import { useMemosContext } from "../hooks/useMemosContext";
 export function MemoListPresenter() {
   const ref = useRef<HTMLInputElement>(null);
   const { memos, asyncDispatch } = useMemosContext();
+  const [filteredMemos, setFilteredMemos] = useState<Memo[]>(memos);
   const { theme } = useThemeContext();
+
+  // 🤔よくあるパターン
+  // レンダリングを効率的に活かせていない
+  // handle...によるレンダリングが発生するたびに、
+  // useEffectによるレンダリングも発生する
+  useEffect(() => {
+    setFilteredMemos(memos);
+  }, [memos]);
 
   async function handleAddMemo(title: Memo["title"]) {
     asyncDispatch(
@@ -76,6 +84,16 @@ export function MemoListPresenter() {
     });
   }
 
+  function filterMemos(which: "marked" | "unmarked" | "all") {
+    if (which === "marked") {
+      setFilteredMemos(memos.filter((memo) => memo.marked));
+    } else if (which === "unmarked") {
+      setFilteredMemos(memos.filter((memo) => !memo.marked));
+    } else {
+      return setFilteredMemos(memos);
+    }
+  }
+
   return (
     <main className="flex flex-col justify-center items-center gap-5">
       <div className="flex flex-col md:col-span-4 lg:col-span-4">
@@ -85,6 +103,11 @@ export function MemoListPresenter() {
             theme === "light" ? "bg-gray-50" : "bg-slate-400"
           )}
         >
+          <div className="flex justify-end">
+            <Button icon={"❤️"} onClick={() => filterMemos("marked")} />
+            <Button icon={"🩶"} onClick={() => filterMemos("unmarked")} />
+            <Button icon={"🧹"} onClick={() => filterMemos("all")} />
+          </div>
           <div
             className={clsx(
               "px-6 rounded-xl ",
@@ -112,7 +135,7 @@ export function MemoListPresenter() {
                 className="bg-pink-300"
               />
             </div>
-            {memos.map((memo) => {
+            {filteredMemos.map((memo) => {
               return (
                 <ListItem
                   key={memo.id}
