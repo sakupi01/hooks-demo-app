@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import { useThemeContext } from "./hooks/useThemeContext";
 import clsx from "clsx";
+import { OnlineStateIndicator } from "./ui/online-state-indicator";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { theme, toggleTheme } = useThemeContext();
@@ -11,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         theme === "light" ? "bg-white" : "bg-slate-600"
       )}
     >
-      <div>
+      <div className="flex justify-center items-center gap-5">
         <select
           className="bg-white rounded-md p-2"
           value={theme}
@@ -22,6 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <option value="light">Light</option>
           <option value="dark">Dark</option>
         </select>
+        <OnlineStateIndicator />
       </div>
       <div className="flex-grow overflow-y-auto py-20">{children}</div>
     </div>
