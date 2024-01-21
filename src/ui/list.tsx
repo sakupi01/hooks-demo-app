@@ -82,9 +82,16 @@ export function MemoListPresenter() {
     } else if (which === "unmarked") {
       return memos.filter((memo) => !memo.marked);
     } else {
+      console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE!!!!!");
+      const startTime = performance.now();
+      while (performance.now() - startTime < 1000) {
+        // 🦥 1秒間何もしない
+      }
       return memos;
     }
   }
+
+  const filteredMemos = filterMemos(filter);
 
   return (
     <main className="flex flex-col justify-center items-center gap-5">
@@ -130,7 +137,7 @@ export function MemoListPresenter() {
             {/* handle...によりレンダリングがトリガーされるタイミングを利用して
             filterMemosで出力するstateを計算する */}
             {/* ✅ レンダリングを効率的に活かせる！ */}
-            {filterMemos(filter).map((memo) => {
+            {filteredMemos.map((memo) => {
               return (
                 <ListItem
                   key={memo.id}
