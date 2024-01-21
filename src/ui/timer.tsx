@@ -7,18 +7,28 @@ export default function Timer() {
   const [leftTime, setLeftTime] = useState(300);
   // ✅直接はUIに影響しないDOMを保持するためにuseRefを使用する
   const domRef = useRef<HTMLInputElement>(null);
+  // ✅これも直接はUIに影響しないinterval IDを保持するためにuseRefを使用する
+  // intervalIDは，タイマーをリセットするために使用
+  const timeRef = useRef(0);
 
   const handleStartTimer = () => {
+    // ✅すでにタイマーが動いている場合は，そのタイマーを消して
+    if (timeRef.current) {
+      console.log("clear the timerID: ", timeRef.current);
+      clearInterval(timeRef.current);
+    }
     // ✅タイマーを生成する
-    setInterval(() => {
+    timeRef.current = setInterval(() => {
       setLeftTime((prev) => {
         // ０になったらタイマーを止める（timerIDを消す）
         if (prev === 0) {
+          clearInterval(timeRef.current);
           return prev;
         }
         return prev - 1;
       });
     }, 1000);
+    console.log("new the timerID: ", timeRef.current);
   };
 
   return (

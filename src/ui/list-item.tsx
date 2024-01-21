@@ -14,11 +14,11 @@ export const MechaOsoiListItem = memo(function MechaOsoiListItem({
   handleUpdateMemoState,
   handleDeleteMemo,
 }: ListItemProps) {
-  // console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE IN LIST ITEM!!!!!");
-  // const startTime = performance.now();
-  // while (performance.now() - startTime < 500) {
-  //   // 🦥 0.5秒間何もしない
-  // }
+  console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE IN LIST ITEM!!!!!");
+  const startTime = performance.now();
+  while (performance.now() - startTime < 500) {
+    // 🦥 0.5秒間何もしない
+  }
 
   const ref = useRef<HTMLInputElement>(null);
   return (
