@@ -26,7 +26,7 @@ export default function ListItem({
         <div className="w-[200px] mr-3">
           <input
             defaultValue={memo.title}
-            className="truncate text-sm font-semibold md:text-base"
+            className="truncate text-sm font-semibold bg-transparent md:text-base"
             ref={ref}
           />
         </div>

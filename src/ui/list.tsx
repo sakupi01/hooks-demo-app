@@ -5,10 +5,13 @@ import { Button } from "./button";
 // import { useReducer } from "react";
 import { memosReducer } from "../reducer";
 import { useAsyncReducer } from "../hooks/useAsyncReducer";
+import { useThemeContext } from "../hooks/useThemeContext";
+import clsx from "clsx";
 
 export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
   const ref = useRef<HTMLInputElement>(null);
   const [memos, asyncDispatch] = useAsyncReducer(memosReducer, initialMemos);
+  const { theme } = useThemeContext();
 
   async function handleAddMemo(title: Memo["title"]) {
     asyncDispatch(
@@ -77,13 +80,25 @@ export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
   return (
     <main className="flex flex-col justify-center items-center gap-5">
       <div className="flex flex-col md:col-span-4 lg:col-span-4">
-        <div className="flex grow flex-col justify-between rounded-xl bg-gray-50 p-4">
-          <div className="bg-white px-6">
+        <div
+          className={clsx(
+            "flex grow flex-col justify-between rounded-xl  p-4",
+            theme === "light" ? "bg-gray-50" : "bg-slate-400"
+          )}
+        >
+          <div
+            className={clsx(
+              "px-6 rounded-xl ",
+              theme === "light"
+                ? "bg-white text-gray-900"
+                : "bg-slate-700 text-white"
+            )}
+          >
             <div className="flex items-center py-4 overflow-hidden ">
               <div className="w-[200px] mr-3">
                 <input
                   placeholder="メモを追加"
-                  className="truncate text-sm font-semibold md:text-base"
+                  className="truncate text-sm font-semibold bg-transparent md:text-base"
                   ref={ref}
                 />
               </div>
@@ -98,8 +113,6 @@ export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
                 className="bg-pink-300"
               />
             </div>
-          </div>
-          <div className="bg-white px-6">
             {memos.map((memo) => {
               return (
                 <ListItem
