@@ -1,6 +1,6 @@
 import { Memo } from "../../types";
 
-type MemoReducerAction =
+export type MemoReducerAction =
   | {
       type: "add";
       payload: Memo;

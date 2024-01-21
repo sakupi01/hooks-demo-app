@@ -2,66 +2,76 @@ import ListItem from "./list-item";
 import { Memo } from "../../types";
 import { useRef } from "react";
 import { Button } from "./button";
-import { useReducer } from "react";
+// import { useReducer } from "react";
 import { memosReducer } from "../reducer";
+import { useAsyncReducer } from "../hooks/useAsyncReducer";
 
 export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
   const ref = useRef<HTMLInputElement>(null);
-  const [memos, dispatch] = useReducer(memosReducer, initialMemos);
+  const [memos, asyncDispatch] = useAsyncReducer(memosReducer, initialMemos);
 
   async function handleAddMemo(title: Memo["title"]) {
-    const addedMemo = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/create/memo`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title: title }),
+    asyncDispatch(
+      // Thunk actionを渡す
+      async (dispatch) => {
+        const addedMemo = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/create/memo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ title: title }),
+          }
+        ).then((res) => res.json());
+        dispatch({ type: "add", payload: addedMemo });
       }
-    ).then((res) => res.json());
-    dispatch({ type: "add", payload: addedMemo });
+    );
   }
 
   async function handleUpdateMemoTitle(memo: Memo) {
-    const updatedMemo = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/update/memo/title`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: memo.id, title: memo.title }),
-      }
-    ).then((res) => res.json());
-
-    dispatch({ type: "update", payload: updatedMemo });
+    asyncDispatch(async (dispatch) => {
+      const updatedMemo = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/update/memo/title`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: memo.id, title: memo.title }),
+        }
+      ).then((res) => res.json());
+      dispatch({ type: "update", payload: updatedMemo });
+    });
   }
 
   async function handleUpdateMemoState(memo: Memo) {
-    const updatedMemo = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/update/memo/state`,
-      {
+    asyncDispatch(async (dispatch) => {
+      const updatedMemo = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/update/memo/state`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: memo.id, marked: memo.marked }),
+        }
+      ).then((res) => res.json());
+      dispatch({ type: "update", payload: updatedMemo });
+    });
+  }
+
+  function handleDeleteMemo(memoId: Memo["id"]) {
+    asyncDispatch(async (dispatch) => {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/memo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: memo.id, marked: memo.marked }),
-      }
-    ).then((res) => res.json());
-
-    dispatch({ type: "update", payload: updatedMemo });
-  }
-
-  function handleDeleteMemo(memoId: Memo["id"]) {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/memo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: memoId }),
+        body: JSON.stringify({ id: memoId }),
+      });
+      dispatch({ type: "delete", payload: { id: memoId } });
     });
-    dispatch({ type: "delete", payload: { id: memoId } });
   }
 
   return (
