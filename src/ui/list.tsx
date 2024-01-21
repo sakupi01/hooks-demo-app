@@ -1,6 +1,6 @@
 import ListItem from "./list-item";
 import { Memo } from "../../types";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./button";
 import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
@@ -9,16 +9,8 @@ import { useMemosContext } from "../hooks/useMemosContext";
 export function MemoListPresenter() {
   const ref = useRef<HTMLInputElement>(null);
   const { memos, asyncDispatch } = useMemosContext();
-  const [filteredMemos, setFilteredMemos] = useState<Memo[]>(memos);
+  const [filter, setFilter] = useState<"marked" | "unmarked" | "all">("all");
   const { theme } = useThemeContext();
-
-  // 🤔よくあるパターン
-  // レンダリングを効率的に活かせていない
-  // handle...によるレンダリングが発生するたびに、
-  // useEffectによるレンダリングも発生する
-  useEffect(() => {
-    setFilteredMemos(memos);
-  }, [memos]);
 
   async function handleAddMemo(title: Memo["title"]) {
     asyncDispatch(
@@ -86,11 +78,11 @@ export function MemoListPresenter() {
 
   function filterMemos(which: "marked" | "unmarked" | "all") {
     if (which === "marked") {
-      setFilteredMemos(memos.filter((memo) => memo.marked));
+      return memos.filter((memo) => memo.marked);
     } else if (which === "unmarked") {
-      setFilteredMemos(memos.filter((memo) => !memo.marked));
+      return memos.filter((memo) => !memo.marked);
     } else {
-      return setFilteredMemos(memos);
+      return memos;
     }
   }
 
@@ -104,9 +96,9 @@ export function MemoListPresenter() {
           )}
         >
           <div className="flex justify-end">
-            <Button icon={"❤️"} onClick={() => filterMemos("marked")} />
-            <Button icon={"🩶"} onClick={() => filterMemos("unmarked")} />
-            <Button icon={"🧹"} onClick={() => filterMemos("all")} />
+            <Button icon={"❤️"} onClick={() => setFilter("marked")} />
+            <Button icon={"🩶"} onClick={() => setFilter("unmarked")} />
+            <Button icon={"🧹"} onClick={() => setFilter("all")} />
           </div>
           <div
             className={clsx(
@@ -135,7 +127,10 @@ export function MemoListPresenter() {
                 className="bg-pink-300"
               />
             </div>
-            {filteredMemos.map((memo) => {
+            {/* handle...によりレンダリングがトリガーされるタイミングを利用して
+            filterMemosで出力するstateを計算する */}
+            {/* ✅ レンダリングを効率的に活かせる！ */}
+            {filterMemos(filter).map((memo) => {
               return (
                 <ListItem
                   key={memo.id}
