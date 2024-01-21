@@ -4,8 +4,16 @@ import { Button } from "./button";
 import { useRef } from "react";
 type ListItemProps = {
   memo: Memo;
+  handleUpdateMemoTitle: (memo: Memo) => void;
+  handleUpdateMemoState: (memo: Memo) => void;
+  handleDeleteMemo: (memoId: Memo["id"]) => void;
 };
-export default function ListItem({ memo }: ListItemProps) {
+export default function ListItem({
+  memo,
+  handleUpdateMemoTitle,
+  handleUpdateMemoState,
+  handleDeleteMemo,
+}: ListItemProps) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div
@@ -28,6 +36,10 @@ export default function ListItem({ memo }: ListItemProps) {
             if (!ref.current) return;
             if (!ref.current.value) return;
             if (ref.current.value === memo.title) return;
+            handleUpdateMemoTitle({
+              ...memo,
+              title: ref.current.value,
+            });
           }}
           className="bg-purple-400"
         />
@@ -36,7 +48,9 @@ export default function ListItem({ memo }: ListItemProps) {
         {memo.marked ? (
           <p
             className={`truncate text-sm font-medium md:text-base`}
-            onClick={() => {}}
+            onClick={() =>
+              handleUpdateMemoState({ ...memo, marked: !memo.marked })
+            }
             role="button"
           >
             ❤️
@@ -44,7 +58,9 @@ export default function ListItem({ memo }: ListItemProps) {
         ) : (
           <p
             className={`truncate text-sm font-medium md:text-base`}
-            onClick={() => {}}
+            onClick={() =>
+              handleUpdateMemoState({ ...memo, marked: !memo.marked })
+            }
             role="button"
           >
             🩶
@@ -54,7 +70,7 @@ export default function ListItem({ memo }: ListItemProps) {
           <p className="w-full text-sm text-gray-500 text-right sm:block">
             {memo.updatedAt.toString()}
           </p>
-          <Button icon={"🗑️"} onClick={() => {}} />
+          <Button icon={"🗑️"} onClick={() => handleDeleteMemo(memo.id)} />
         </div>
       </div>
     </div>

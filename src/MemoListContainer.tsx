@@ -23,7 +23,7 @@ function MemoListContainer() {
       .catch(console.error);
     didInit = true;
   }, []);
-  return <MemoListPresenter memos={memos} />;
+  return <MemoListPresenter memos={memos} setMemos={setMemos} />;
 }
 
 export default MemoListContainer;
