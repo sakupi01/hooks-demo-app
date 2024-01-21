@@ -3,14 +3,13 @@ import { Memo } from "../../types";
 import { useRef } from "react";
 import { Button } from "./button";
 // import { useReducer } from "react";
-import { memosReducer } from "../reducer";
-import { useAsyncReducer } from "../hooks/useAsyncReducer";
 import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
+import { useMemosContext } from "../hooks/useMemosContext";
 
-export function MemoListPresenter({ memos: initialMemos }: { memos: Memo[] }) {
+export function MemoListPresenter() {
   const ref = useRef<HTMLInputElement>(null);
-  const [memos, asyncDispatch] = useAsyncReducer(memosReducer, initialMemos);
+  const { memos, asyncDispatch } = useMemosContext();
   const { theme } = useThemeContext();
 
   async function handleAddMemo(title: Memo["title"]) {

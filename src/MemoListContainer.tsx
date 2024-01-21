@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { MemoListPresenter } from "./ui/list";
 import { Memo } from "../types";
+import MemosProvider from "./provider/memos";
 
 // Tips: トップレベルのコードは、コンポーネントがインポートされたときに、一度だけ実行される
 let didInit = false;
@@ -26,7 +27,11 @@ function MemoListContainer() {
   if (memos === undefined) {
     return;
   }
-  return <MemoListPresenter memos={memos} />;
+  return (
+    <MemosProvider initialMemos={memos}>
+      <MemoListPresenter />
+    </MemosProvider>
+  );
 }
 
 export default MemoListContainer;

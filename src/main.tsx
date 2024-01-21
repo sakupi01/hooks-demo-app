@@ -3,14 +3,14 @@ import ReactDOM from "react-dom/client";
 import MemoListContainer from "./MemoListContainer.tsx";
 import "./index.css";
 import Layout from "./layout";
-import Provider from "./provider/index";
+import ThemeProvider from "./provider/theme";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Provider>
+    <ThemeProvider>
       <Layout>
         <MemoListContainer />
       </Layout>
-    </Provider>
+    </ThemeProvider>
   </React.StrictMode>
 );

@@ -2,6 +2,12 @@ import { useReducer, useCallback, Dispatch, Reducer } from "react";
 import { MemoReducerAction } from "../reducer";
 import { Memo } from "../../types";
 
+export type MemoReducerDispatchAction = (
+  action:
+    | MemoReducerAction // 同期アクションのとき
+    | ((dispatch: Dispatch<MemoReducerAction>) => Promise<void>) // 非同期アクションのとき // thunk action
+) => Promise<void>;
+
 // 非同期アクションのためのDispatcher
 const asyncDispatcher =
   <T>(dispatch: Dispatch<T>) =>
@@ -16,14 +22,7 @@ const asyncDispatcher =
 export const useAsyncReducer = (
   reducer: Reducer<Memo[], MemoReducerAction>,
   initialState: Memo[]
-): [
-  Memo[],
-  (
-    action:
-      | MemoReducerAction // 同期アクションのとき
-      | ((dispatch: Dispatch<MemoReducerAction>) => Promise<void>) // 非同期アクションのとき // thunk action
-  ) => Promise<void>
-] => {
+): [Memo[], MemoReducerDispatchAction] => {
   const [state, dispatch] = useReducer(reducer, initialState);
   // ✅カスタムフック内では、useCallbackを使って関数をメモ化することが推奨されている
   const asyncDispatch = useCallback(
