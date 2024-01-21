@@ -1,6 +1,6 @@
 import ListItem from "./list-item";
 import { Memo } from "../../types";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "./button";
 import { useThemeContext } from "../hooks/useThemeContext";
 import clsx from "clsx";
@@ -76,22 +76,24 @@ export function MemoListPresenter() {
     });
   }
 
-  function filterMemos(which: "marked" | "unmarked" | "all") {
-    if (which === "marked") {
-      return memos.filter((memo) => memo.marked);
-    } else if (which === "unmarked") {
-      return memos.filter((memo) => !memo.marked);
-    } else {
-      console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE!!!!!");
-      const startTime = performance.now();
-      while (performance.now() - startTime < 1000) {
-        // 🦥 1秒間何もしない
+  // ✅ useMemoを使って、filter, memos以外のstateが変更された時の再計算をスキップする
+  const filteredMemos = useMemo(() => {
+    function filterMemos(which: "marked" | "unmarked" | "all") {
+      if (which === "marked") {
+        return memos.filter((memo) => memo.marked);
+      } else if (which === "unmarked") {
+        return memos.filter((memo) => !memo.marked);
+      } else {
+        console.log("!!!!!SIGNIFICANT PERFORMANCE ISSUE!!!!!");
+        const startTime = performance.now();
+        while (performance.now() - startTime < 1000) {
+          // 🦥 1秒間何もしない
+        }
+        return memos;
       }
-      return memos;
     }
-  }
-
-  const filteredMemos = filterMemos(filter);
+    return filterMemos(filter);
+  }, [filter, memos]);
 
   return (
     <main className="flex flex-col justify-center items-center gap-5">
