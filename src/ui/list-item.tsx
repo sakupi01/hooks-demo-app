@@ -8,6 +8,9 @@ type ListItemProps = {
   handleUpdateMemoState: (memo: Memo) => void;
   handleDeleteMemo: (memoId: Memo["id"]) => void;
 };
+// ✅memoを利用してpropsが変更されていない場合はコンポーネントの再レンダーをスキップ
+// コンポーネントに渡されるhandle...関数はuseCallbackによりキャッシュされているため、
+// propsが変更されていない場合は、コンポーネントの再レンダーがスキップされる。
 export const MechaOsoiListItem = memo(function MechaOsoiListItem({
   memo,
   handleUpdateMemoTitle,

@@ -12,10 +12,6 @@ export const MemoListPresenter = function MemoListPresenter() {
   const [filter, setFilter] = useState<"marked" | "unmarked" | "all">("all");
   const { theme } = useThemeContext();
 
-  // ✅キャッシュしたいMechaOsoiListItemが受け取るpropsである
-  // handle...系関数をuseCallbackによりキャッシュする
-  // useCallbackを使用しない場合は，関数はレンダリングのたびに再生成される
-  // asyncDispatch以外の変更があった時以外は，同じ参照の関数が使用される（キャッシュされる）
   const handleAddMemo = useCallback(
     (title: Memo["title"]) => {
       asyncDispatch(
@@ -38,6 +34,10 @@ export const MemoListPresenter = function MemoListPresenter() {
     [asyncDispatch]
   );
 
+  // ✅キャッシュしたいMechaOsoiListItemが受け取るpropsである、
+  // handleUpdateMemoTitle関数をuseCallbackによりキャッシュする。
+  // useCallbackを使用しない場合は、関数はレンダリングのたびに再生成される。
+  // asyncDispatch以外の変更があった時以外は，同じ参照の関数が使用される（キャッシュされる）
   const handleUpdateMemoTitle = useCallback(
     (memo: Memo) => {
       asyncDispatch(async (dispatch) => {
