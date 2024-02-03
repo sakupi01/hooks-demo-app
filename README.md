@@ -1,5 +1,19 @@
 ## ✅Memo
 
+```
+git clone git@github.com:saku-1101/hooks-demo-app.git
+cd hooks-demo-app
+code .
+.env を作って埋める
+bun install
+bun run dev 　(-> フロントエンド)
+cd api
+api/.env を作って埋める
+docker-compose up --build 　(-> DB)
+bun install
+bun run dev 　(-> バックエンド)
+```
+
 DB: 5432 / DB GUI: 8080 / API: 3000 / APP: 8000
 
 Web Server:
